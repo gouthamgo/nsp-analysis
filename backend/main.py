@@ -9,6 +9,10 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import traceback
+# New imports for topic modeling and advanced sentiment
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from textblob import TextBlob
 
 app = FastAPI()
 
@@ -235,6 +239,116 @@ async def analyze_nps(file: UploadFile = File(...)):
             # Fallback values
             sentiment_counts = {"positive": 60, "neutral": 30, "negative": 10}
         
+        # NEW FEATURE 1: Topic Modeling for Customer Feedback
+        topics = []
+        try:
+            if feedback_col and len(df[feedback_col].dropna()) >= 20:
+                # Prepare text data
+                feedback_text = df[feedback_col].dropna().astype(str).tolist()
+                
+                # Use Count Vectorizer to transform text to numerical data
+                vectorizer = CountVectorizer(max_df=0.95, min_df=2, stop_words='english')
+                dtm = vectorizer.fit_transform(feedback_text)
+                
+                # Apply LDA for topic modeling
+                lda = LatentDirichletAllocation(n_components=5, random_state=42)
+                lda.fit(dtm)
+                
+                # Get top words for each topic
+                feature_names = vectorizer.get_feature_names_out()
+                
+                for topic_idx, topic in enumerate(lda.components_):
+                    top_words_idx = topic.argsort()[:-10 - 1:-1]
+                    top_words = [feature_names[i] for i in top_words_idx]
+                    
+                    # Assign a simple name based on top words
+                    topic_name = f"Topic {topic_idx+1}: {top_words[0].title()} & {top_words[1].title()}"
+                    
+                    topics.append({
+                        "id": topic_idx,
+                        "name": topic_name,
+                        "top_words": top_words,
+                        "weight": float(topic.sum() / lda.components_.sum())
+                    })
+                    
+                # For each feedback, find the dominant topic
+                topic_results = lda.transform(dtm)
+                dominant_topics = topic_results.argmax(axis=1)
+                
+                # Count feedback by dominant topic
+                topic_counts = {}
+                for topic_idx in range(len(topics)):
+                    count = (dominant_topics == topic_idx).sum()
+                    topics[topic_idx]["count"] = int(count)
+                    
+        except Exception as e:
+            print(f"Error in topic modeling: {str(e)}")
+        
+        # NEW FEATURE 2: Advanced Sentiment Analysis
+        advanced_sentiment = {
+            "emotions": {"joy": 0, "sadness": 0, "anger": 0, "surprise": 0, "fear": 0},
+            "intensity_distribution": {"strong_positive": 0, "moderate_positive": 0, 
+                                      "neutral": 0, "moderate_negative": 0, "strong_negative": 0}
+        }
+
+        try:
+            if feedback_col:
+                # Simple emotion detection with keyword approach
+                emotion_keywords = {
+                    "joy": ["happy", "love", "great", "excellent", "amazing", "awesome", "perfect", "wonderful", "delighted"],
+                    "sadness": ["sad", "disappointed", "unhappy", "regret", "missing", "unfortunate", "sorry"],
+                    "anger": ["angry", "frustrat", "annoy", "terrible", "awful", "horrible", "bad", "unacceptable"],
+                    "surprise": ["wow", "surprise", "unexpected", "amazed", "astonished"],
+                    "fear": ["afraid", "worried", "concern", "fear", "anxious", "scared"]
+                }
+                
+                emotion_counts = {emotion: 0 for emotion in emotion_keywords}
+                intensity_counts = {"strong_positive": 0, "moderate_positive": 0, 
+                                   "neutral": 0, "moderate_negative": 0, "strong_negative": 0}
+                
+                for text in df[feedback_col].dropna():
+                    if not isinstance(text, str) or len(text) < 5:
+                        continue
+                        
+                    # TextBlob for polarity and subjectivity
+                    blob = TextBlob(text)
+                    polarity = blob.sentiment.polarity
+                    
+                    # Classify intensity
+                    if polarity >= 0.5:
+                        intensity_counts["strong_positive"] += 1
+                    elif polarity >= 0.1:
+                        intensity_counts["moderate_positive"] += 1
+                    elif polarity <= -0.5:
+                        intensity_counts["strong_negative"] += 1
+                    elif polarity <= -0.1:
+                        intensity_counts["moderate_negative"] += 1
+                    else:
+                        intensity_counts["neutral"] += 1
+                    
+                    # Detect emotions
+                    text_lower = text.lower()
+                    for emotion, keywords in emotion_keywords.items():
+                        for keyword in keywords:
+                            if keyword in text_lower:
+                                emotion_counts[emotion] += 1
+                                break
+                
+                # Calculate percentages for emotions
+                total_emotions = sum(emotion_counts.values())
+                if total_emotions > 0:
+                    for emotion, count in emotion_counts.items():
+                        advanced_sentiment["emotions"][emotion] = round((count / total_emotions) * 100)
+                
+                # Calculate percentages for intensity
+                total_intensity = sum(intensity_counts.values())
+                if total_intensity > 0:
+                    for intensity, count in intensity_counts.items():
+                        advanced_sentiment["intensity_distribution"][intensity] = round((count / total_intensity) * 100)
+                
+        except Exception as e:
+            print(f"Error in advanced sentiment analysis: {str(e)}")
+        
         # Return analysis results with enhanced insights
         return {
             "summary": {
@@ -254,7 +368,11 @@ async def analyze_nps(file: UploadFile = File(...)):
             "promoterKeywords": promoter_keywords_analysis,
             "detractorKeywords": detractor_keywords_analysis,
             "feedbackSentiment": sentiment_counts,
-            "feedbackSamples": feedback_samples
+            "feedbackSamples": feedback_samples,
+            
+            # New analysis components
+            "topics": topics,
+            "advancedSentiment": advanced_sentiment
         }
         
     except Exception as e:

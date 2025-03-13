@@ -9,7 +9,9 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install fastapi uvicorn pandas nltk scikit-learn python-multipart
+pip install fastapi uvicorn pandas nltk scikit-learn python-multipart  textblob
+
+pip install fastapi uvicorn pandas numpy nltk scikit-learn textblob python-multipart
 
 # Run the server
 uvicorn main:app --reload

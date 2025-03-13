@@ -1,7 +1,8 @@
 import React from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line
+  PieChart, Pie, Cell, LineChart, Line, Legend, RadarChart, 
+  PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts';
 
 const NPSDashboard = ({ data }) => {
@@ -15,7 +16,10 @@ const NPSDashboard = ({ data }) => {
     promoterKeywords,
     detractorKeywords,
     feedbackSentiment, 
-    feedbackSamples 
+    feedbackSamples,
+    // New data props
+    topics,
+    advancedSentiment
   } = data;
   
   const getNpsColorClass = (score) => {
@@ -25,6 +29,7 @@ const NPSDashboard = ({ data }) => {
   };
   
   const pieColors = ['#10B981', '#94A3B8', '#EF4444']; // green, gray, red
+  const emotionColors = ['#10B981', '#3B82F6', '#EF4444', '#F59E0B', '#8B5CF6']; // green, blue, red, amber, purple
   
   return (
     <div>
@@ -106,7 +111,131 @@ const NPSDashboard = ({ data }) => {
         </div>
       </div>
       
-      {/* NEW: Location Volume instead of Location NPS */}
+      {/* NEW: Topic Analysis Section */}
+      {topics && topics.length > 0 && (
+        <div className="card">
+          <h3 className="card-title">Topic Analysis</h3>
+          <div className="grid grid-cols-1 grid-cols-2">
+            <div style={{ height: '250px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={topics}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({name, percent}) => `${name.split(':')[0]}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="count"
+                  >
+                    {topics.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={`#${Math.floor((index * 4311 + 5437) % 16777215).toString(16)}`} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name, props) => [value, props.payload.name]} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Topic Details</h4>
+              <div className="overflow-y-auto" style={{ maxHeight: '220px' }}>
+                {topics.map((topic, index) => (
+                  <div key={index} className="mb-3">
+                    <p className="font-medium">{topic.name}</p>
+                    <p className="text-sm text-gray">
+                      Top words: {topic.top_words.slice(0, 5).join(', ')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* NEW: Advanced Sentiment Analysis */}
+      {advancedSentiment && (
+        <div className="card">
+          <h3 className="card-title">Advanced Sentiment Analysis</h3>
+          <div className="grid grid-cols-1 grid-cols-2">
+            {/* Emotion Distribution */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Emotion Distribution</h4>
+              <div style={{ height: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart outerRadius={90} data={[
+                    {
+                      emotion: 'Joy',
+                      value: advancedSentiment.emotions.joy,
+                      fullMark: 100
+                    },
+                    {
+                      emotion: 'Sadness',
+                      value: advancedSentiment.emotions.sadness,
+                      fullMark: 100
+                    },
+                    {
+                      emotion: 'Anger',
+                      value: advancedSentiment.emotions.anger,
+                      fullMark: 100
+                    },
+                    {
+                      emotion: 'Surprise',
+                      value: advancedSentiment.emotions.surprise,
+                      fullMark: 100
+                    },
+                    {
+                      emotion: 'Fear',
+                      value: advancedSentiment.emotions.fear,
+                      fullMark: 100
+                    }
+                  ]}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="emotion" />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                    <Radar name="Emotions" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                    <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* Sentiment Intensity */}
+            <div>
+              <h4 className="text-sm font-semibold mb-2">Sentiment Intensity</h4>
+              <div style={{ height: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={[
+                      { name: "Strong Positive", value: advancedSentiment.intensity_distribution.strong_positive, color: "#10B981" },
+                      { name: "Moderate Positive", value: advancedSentiment.intensity_distribution.moderate_positive, color: "#34D399" },
+                      { name: "Neutral", value: advancedSentiment.intensity_distribution.neutral, color: "#94A3B8" },
+                      { name: "Moderate Negative", value: advancedSentiment.intensity_distribution.moderate_negative, color: "#F87171" },
+                      { name: "Strong Negative", value: advancedSentiment.intensity_distribution.strong_negative, color: "#EF4444" }
+                    ]}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" width={100} />
+                    <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
+                    <Bar dataKey="value" name="Percentage">
+                      {[0, 1, 2, 3, 4].map((index) => (
+                        <Cell key={`cell-${index}`} fill={[
+                          "#10B981", "#34D399", "#94A3B8", "#F87171", "#EF4444"
+                        ][index]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location Analysis - Keep as is */}
       <div className="grid grid-cols-1 grid-cols-2">
         {locationVolumes && locationVolumes.length > 0 && (
           <div className="card">
@@ -158,7 +287,7 @@ const NPSDashboard = ({ data }) => {
         )}
       </div>
       
-      {/* NEW: Promoter vs Detractor Keywords */}
+      {/* Promoter vs Detractor Keywords */}
       <div className="grid grid-cols-1 grid-cols-2">
         {promoterKeywords && promoterKeywords.length > 0 && (
           <div className="card">

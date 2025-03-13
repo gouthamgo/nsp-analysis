@@ -7,7 +7,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [analysisData, setAnalysisData] = useState(null);
   const [error, setError] = useState(null);
-
+  
   const handleFileUpload = async (file) => {
     setLoading(true);
     setError(null);
@@ -25,7 +25,7 @@ function App() {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="container">
       <h1 className="page-title">NPS Analysis Dashboard</h1>
@@ -40,6 +40,16 @@ function App() {
       
       {analysisData && !loading && (
         <NPSDashboard data={analysisData} />
+      )}
+      
+      {loading && (
+        <div className="card">
+          <div className="text-center py-8">
+            <div className="spinner"></div>
+            <p className="mt-4 text-gray">Analyzing your NPS data...</p>
+            <p className="text-sm text-gray">This may take a few moments as we run advanced analysis on your feedback.</p>
+          </div>
+        </div>
       )}
     </div>
   );
