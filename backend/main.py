@@ -13,6 +13,8 @@ import traceback
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
 from textblob import TextBlob
+# Import the new feedback analysis module
+import feedback_analysis
 
 app = FastAPI()
 
@@ -349,6 +351,63 @@ async def analyze_nps(file: UploadFile = File(...)):
         except Exception as e:
             print(f"Error in advanced sentiment analysis: {str(e)}")
         
+        # NEW ANALYSIS - Use the feedback analysis module
+        # Prepare the feedback texts for analysis
+        if feedback_col:
+            feedback_texts = df[feedback_col].dropna().astype(str).tolist()
+            
+            # Text Categorization
+            categorized_feedback = feedback_analysis.categorize_feedback(feedback_texts)
+            
+            # Get category distribution
+            category_counts = {}
+            for item in categorized_feedback:
+                category = item["primary_category"]
+                if category not in category_counts:
+                    category_counts[category] = 0
+                category_counts[category] += 1
+            
+            # Convert to sorted list for the response
+            category_distribution = [
+                {"name": category, "count": count} 
+                for category, count in sorted(category_counts.items(), key=lambda x: x[1], reverse=True)
+            ]
+            
+            # Aspect-Based Sentiment Analysis
+            aspect_sentiment = feedback_analysis.analyze_aspect_sentiment(feedback_texts)
+            
+            # NPS Drivers Analysis
+            # Extract score-feedback pairs for NPS drivers analysis
+            # if score_col:
+            #     score_feedback_pairs = []
+            #     for _, row in df.iterrows():
+            #         if pd.notna(row[feedback_col]) and isinstance(row[feedback_col], str) and pd.notna(row[score_col]):
+            #             score_feedback_pairs.append({
+            #                 "text": row[feedback_col], 
+            #                 "score": row[score_col]
+            #             })
+                
+            #     nps_drivers = feedback_analysis.analyze_nps_drivers(score_feedback_pairs)
+            # else:
+            #     nps_drivers = {
+            #         "keyword_impact": {"positive": [], "negative": []},
+            #         "high_impact_phrases": {"positive": [], "negative": []}
+            #     }
+        else:
+            # Default empty values if no feedback column
+            category_distribution = []
+            categorized_feedback = []
+            aspect_sentiment = {
+                "aspect_sentiments": {},
+                "aspect_mentions": {},
+                "samples": {},
+                "sorted_aspects": []
+            }
+            # nps_drivers = {
+            #     "keyword_impact": {"positive": [], "negative": []},
+            #     "high_impact_phrases": {"positive": [], "negative": []}
+            # }
+        
         # Return analysis results with enhanced insights
         return {
             "summary": {
@@ -370,9 +429,15 @@ async def analyze_nps(file: UploadFile = File(...)):
             "feedbackSentiment": sentiment_counts,
             "feedbackSamples": feedback_samples,
             
-            # New analysis components
+            # Original new components
             "topics": topics,
-            "advancedSentiment": advanced_sentiment
+            "advancedSentiment": advanced_sentiment,
+            
+            # Additional analysis from feedback_analysis.py
+            "categoryDistribution": category_distribution,
+            "categorizedFeedback": categorized_feedback[:20],  # Limit to top 20 for response size
+            "aspectSentiment": aspect_sentiment,
+            # "npsDrivers": nps_drivers
         }
         
     except Exception as e:
