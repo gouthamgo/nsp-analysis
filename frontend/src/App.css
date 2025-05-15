@@ -94,3 +94,429 @@
 .overflow-y-auto {
   overflow-y: auto;
 }
+
+
+
+/* Enhanced Chart and Dashboard Styles */
+
+/* NPS Score Container */
+.nps-score-container {
+  display: flex;
+  align-items: flex-start;
+}
+
+.nps-context {
+  margin-left: 1rem;
+}
+
+.nps-label {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.nps-calculation {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+/* Legend Enhancements */
+.legend-count {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Chart Summary */
+.chart-summary {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.summary-stat {
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #4b5563;
+  margin-right: 0.5rem;
+}
+
+.stat-value {
+  color: #111827;
+}
+
+/* Chart Title & Subtitle */
+.chart-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* Topic Analysis Styles */
+.topic-details {
+  max-height: 225px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.topic-item {
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.topic-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.topic-stats {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.topic-count {
+  font-weight: 500;
+}
+
+.topic-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.topic-word {
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.topic-insight {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+/* Sentiment Analysis Enhancement Styles */
+.emotion-summary,
+.sentiment-summary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+}
+
+.sentiment-insight-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+.insight-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e40af;
+}
+
+.insight-content {
+  color: #1f2937;
+  line-height: 1.5;
+}
+
+/* Make tooltips more visible */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Feedback Section */
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .nps-score-container {
+    flex-direction: column;
+  }
+  
+  .nps-context {
+    margin-left: 0;
+    margin-top: 0.75rem;
+  }
+  
+  .chart-summary {
+    flex-direction: column;
+  }
+  
+  .summary-stat {
+    margin-right: 0;
+  }
+  
+  .emotion-summary,
+  .sentiment-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+
+/* Feedback Section without scrollbar */
+.feedback-list-no-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  /* No max-height constraint */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Feedback Categories Styles */
+.categorized-feedback-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.categorized-feedback-item {
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.categorized-feedback-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.category-tag {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.secondary-category-tag {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  background-color: #e5e7eb;
+  color: #4b5563;
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.categorized-feedback-text {
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-style: italic;
+}
+
+.category-insight {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+/* Aspect Sentiment Styles */
+.aspect-samples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.aspect-sample-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+}
+
+.aspect-sample-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.aspect-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.aspect-sentiment {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+}
+
+.aspect-sentiment.positive {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.aspect-sentiment.negative {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.aspect-sample-distribution {
+  display: flex;
+  height: 0.5rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.aspect-positive {
+  background-color: #10b981;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.625rem;
+}
+
+.aspect-neutral {
+  background-color: #94a3b8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.625rem;
+}
+
+.aspect-negative {
+  background-color: #ef4444;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 0.625rem;
+}
+
+.aspect-sample-quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aspect-quote {
+  font-size: 0.75rem;
+  font-style: italic;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.aspect-quote-positive {
+  background-color: #ecfdf5;
+  border-left: 3px solid #10b981;
+}
+
+.aspect-quote-negative {
+  background-color: #fef2f2;
+  border-left: 3px solid #ef4444;
+}
+
+.aspect-quote-neutral {
+  background-color: #f3f4f6;
+  border-left: 3px solid #94a3b8;
+}
+
+.aspect-insight {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+/* NPS Drivers Styles */
+.impact-phrases {
+  margin-top: 0.75rem;
+}
+
+.impact-phrase-item {
+  font-size: 0.75rem;
+  font-style: italic;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.impact-phrase-item.positive {
+  background-color: #ecfdf5;
+  border-left: 3px solid #10b981;
+}
+
+.impact-phrase-item.negative {
+  background-color: #fef2f2;
+  border-left: 3px solid #ef4444;
+}
+
+.drivers-insight {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.375rem;
+}
+
+/* General Insight Styles - shared by all components */
+.insight-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e40af;
+}
+
+.insight-content {
+  color: #1f2937;
+  line-height: 1.5;
+}
